@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import todoService from '../services/todoService';
 import { useAuth } from '../context/AuthContext';
 
@@ -8,7 +8,13 @@ const useTodos = () => {
   const [error, setError] = useState(null);
   const { isAuthenticated, user } = useAuth();
 
-  const fetchTodos = async () => {
+  const [pagination, setPagination] = useState({
+    page: 1,
+    totalPages: 1,
+    totalTodos: 0
+  });
+
+  const fetchTodos = useCallback(async (page = 1, limit = 10) => {
     if (!isAuthenticated || !user) {
       setTodos([]);
       return;
@@ -18,13 +24,24 @@ const useTodos = () => {
     setError(null);
     
     try {
-      const data = await todoService.getTodos();
-      setTodos(data);
+      const { todos, page: currentPage, totalPages, totalTodos } = await todoService.getTodos(page, limit);
+      setTodos(todos);
+      setPagination({
+        page: currentPage,
+        totalPages,
+        totalTodos
+      });
     } catch (err) {
       setError(err.message);
       setTodos([]);
     } finally {
       setLoading(false);
+    }
+  }, [isAuthenticated, user]);
+
+  const changePage = (newPage) => {
+    if (newPage >= 1 && newPage <= pagination.totalPages) {
+      fetchTodos(newPage);
     }
   };
 
@@ -34,7 +51,7 @@ const useTodos = () => {
     } else {
       setTodos([]);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, fetchTodos]);
 
   const createTodo = async (todoData) => {
     if (!isAuthenticated) {
@@ -94,11 +111,13 @@ const useTodos = () => {
     todos,
     loading,
     error,
+    pagination,
     createTodo,
     updateTodo,
     deleteTodo,
     getTodo,
-    refreshTodos: fetchTodos
+    refreshTodos: fetchTodos,
+    changePage
   };
 };
 

@@ -17,6 +17,14 @@ const TodoSchema = new mongoose.Schema({
     type: [String],
     default: [],
   },
+  notes: {
+    type: String,
+    default: ''
+  },
+  mentionedUsers: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
   createdAt: {
     type: Date,
     default: Date.now,

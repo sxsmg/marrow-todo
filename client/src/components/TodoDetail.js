@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useTodoContext } from '../context/TodoContext';
+import EditTodoModal from './EditTodoModal';
 
-const TodoDetail = () => {
+const TodoDetail = ({ onUpdate }) => {
+  const [showEditModal, setShowEditModal] = useState(false);
   const { id } = useParams();
   const [todo, setTodo] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -32,14 +34,18 @@ const TodoDetail = () => {
     fetchTodo();
   }, [id, getTodo]);
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate(); // Reserved for future navigation needs
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.includes('required') ? 'Invalid todo ID' : error}</div>;
   if (!todo) return <div>Todo not found</div>;
 
   const handleEdit = () => {
-    navigate(`/todos/${todo._id}/edit`);
+    setShowEditModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowEditModal(false);
   };
 
   return (
@@ -50,6 +56,13 @@ const TodoDetail = () => {
           Edit
         </button>
       </div>
+      {showEditModal && (
+        <EditTodoModal 
+          todo={todo} 
+          onClose={handleCloseModal} 
+          onUpdate={onUpdate}
+        />
+      )}
       <p className="description">{todo.description}</p>
       <div className="todo-info">
         <div className="meta">
