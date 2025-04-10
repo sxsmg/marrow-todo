@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { TodoProvider } from './context/TodoContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import TodoList from './components/TodoList';
-import TodoDetail from './components/TodoDetail';
+import TodoDetailWrapper from './components/TodoDetailWrapper';
 import TodoForm from './components/TodoForm';
 import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
@@ -21,7 +21,7 @@ function App() {
               <Route path="/" element={<ProtectedRoute><TodoList /></ProtectedRoute>} />
               <Route path="/todos/new" element={<ProtectedRoute><TodoForm /></ProtectedRoute>} />
               <Route path="/todos/:id/edit" element={<ProtectedRoute><TodoForm /></ProtectedRoute>} />
-              <Route path="/todos/:id" element={<ProtectedRoute><TodoDetail /></ProtectedRoute>} />
+              <Route path="/todos/:id" element={<ProtectedRoute><TodoDetailWrapper /></ProtectedRoute>} />
               <Route path="/login" element={<LoginForm />} />
               <Route path="/register" element={<RegisterForm />} />
             </Routes>

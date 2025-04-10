@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 const connectDB = require('./db');
 const todoRoutes = require('./routes/todoRoutes');
 const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ app.use(bodyParser.json());
 // Routes
 app.use('/api/todos', todoRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

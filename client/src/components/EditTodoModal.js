@@ -14,7 +14,7 @@ const EditTodoModal = ({ todo, onClose, onUpdate }) => {
   });
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { updateTodo } = useTodoContext();
+  const { updateTodo, deleteTodo } = useTodoContext();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -32,10 +32,14 @@ const EditTodoModal = ({ todo, onClose, onUpdate }) => {
 
   const fetchMentionSuggestions = async (query) => {
     try {
-      const response = await axios.get('/api/users', {
+      const token = localStorage.getItem('token');
+      const response = await axios.get('http://localhost:5000/api/users', {
         params: {
           search: query,
           exclude: currentUser._id
+        },
+        headers: {
+          Authorization: `Bearer ${token}`
         }
       });
       setMentionSuggestions(response.data);
@@ -56,11 +60,7 @@ const EditTodoModal = ({ todo, onClose, onUpdate }) => {
     if (atIndex !== -1) {
       const query = value.slice(atIndex + 1);
       setMentionQuery(query);
-      if (query.length > 0) {
-        fetchMentionSuggestions(query);
-      } else {
-        setMentionSuggestions([]);
-      }
+      fetchMentionSuggestions(query);
     } else {
       setMentionQuery('');
       setMentionSuggestions([]);
@@ -178,10 +178,35 @@ const EditTodoModal = ({ todo, onClose, onUpdate }) => {
           {error && <div className="error">{error}</div>}
 
           <div className="modal-actions">
-            <button type="button" onClick={onClose} disabled={isSubmitting}>
+            <button 
+              type="button" 
+              className="btn-delete"
+              onClick={async () => {
+                if (window.confirm('Are you sure you want to delete this todo?')) {
+                  try {
+                    await deleteTodo(todo._id);
+                    onUpdate();
+                    onClose();
+                  } catch (err) {
+                    setError(err.message);
+                  }
+                }
+              }}
+              disabled={isSubmitting}
+            >
+              Delete
+            </button>
+            <button 
+              type="button" 
+              onClick={onClose} 
+              disabled={isSubmitting}
+            >
               Cancel
             </button>
-            <button type="submit" disabled={isSubmitting}>
+            <button 
+              type="submit" 
+              disabled={isSubmitting}
+            >
               {isSubmitting ? 'Saving...' : 'Save'}
             </button>
           </div>

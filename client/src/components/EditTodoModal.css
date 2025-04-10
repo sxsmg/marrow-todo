@@ -74,6 +74,15 @@
   color: white;
 }
 
+.modal-actions .btn-delete {
+  background-color: #dc3545;
+  color: white;
+}
+
+.modal-actions .btn-delete:hover {
+  background-color: #c82333;
+}
+
 .modal-actions button:disabled {
   opacity: 0.7;
   cursor: not-allowed;
