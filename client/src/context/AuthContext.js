@@ -6,6 +6,7 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const verifyToken = async (token) => {
     try {
@@ -29,21 +30,30 @@ export const AuthProvider = ({ children }) => {
           if (userData) {
             setUser(userData);
             setIsAuthenticated(true);
-            return;
           }
         } catch (error) {
           console.error('Token verification failed:', error);
         }
       }
-      logout();
+      setLoading(false);
     };
+
     initializeAuth();
   }, []);
 
-  const login = (token, userData) => {
+  const login = async (token, userData) => {
     localStorage.setItem('token', token);
-    setUser(userData);
-    setIsAuthenticated(true);
+    
+    // Verify token before setting state
+    const verifiedUser = await verifyToken(token);
+    if (verifiedUser) {
+      setUser(verifiedUser);
+      setIsAuthenticated(true);
+      return true;
+    }
+    
+    logout();
+    return false;
   };
 
   const logout = () => {
@@ -53,7 +63,13 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+    <AuthContext.Provider value={{
+      isAuthenticated,
+      user,
+      loading,
+      login,
+      logout
+    }}>
       {children}
     </AuthContext.Provider>
   );
