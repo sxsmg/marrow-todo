@@ -17,9 +17,9 @@ const TodoItem = ({ todo }) => {
   return (
     <li className="todo-item">
       <div className="todo-content">
-        <button onClick={handleDelete} className="btn-delete">
+        {/* <button onClick={handleDelete} className="btn-delete">
           Delete
-        </button>
+        </button> */}
         <h3>
           <Link to={`/todos/${todo._id}`}>{todo.title}</Link>
         </h3>

@@ -42,8 +42,27 @@ exports.getAllTodos = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    const todos = await Todo.find({ user: req.user._id })
-      .sort({ createdAt: -1 })
+    const { priority, tags, sort } = req.query;
+    const query = { user: req.user._id };
+
+    if (priority) {
+      query.priority = priority;
+    }
+
+    if (tags) {
+      query.tags = { $in: tags.split(',') };
+    }
+
+    const sortOptions = {};
+    if (sort) {
+      const [field, order] = sort.split(':');
+      sortOptions[field] = order === 'desc' ? -1 : 1;
+    } else {
+      sortOptions.createdAt = -1;
+    }
+
+    const todos = await Todo.find(query)
+      .sort(sortOptions)
       .skip(skip)
       .limit(limit)
       .populate('mentionedUsers', 'username');

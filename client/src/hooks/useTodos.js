@@ -13,8 +13,10 @@ const useTodos = () => {
     totalPages: 1,
     totalTodos: 0
   });
+  const [filters, setFilters] = useState({});
+  const [sort, setSort] = useState('createdAt:desc');
 
-  const fetchTodos = useCallback(async (page = 1, limit = 10) => {
+  const fetchTodos = useCallback(async (page = 1, limit = 10, filters = {}, sort = 'createdAt:desc') => {
     if (!isAuthenticated || !user) {
       setTodos([]);
       return;
@@ -24,7 +26,7 @@ const useTodos = () => {
     setError(null);
     
     try {
-      const { todos, page: currentPage, totalPages, totalTodos } = await todoService.getTodos(page, limit);
+      const { todos, page: currentPage, totalPages, totalTodos } = await todoService.getTodos(page, limit, filters, sort);
       setTodos(todos);
       setPagination({
         page: currentPage,
@@ -107,6 +109,21 @@ const useTodos = () => {
     }
   };
 
+  const changeFilter = (type, value) => {
+    setFilters(prev => ({
+      ...prev,
+      [type]: value || undefined
+    }));
+  };
+
+  const changeSort = (newSort) => {
+    setSort(newSort);
+  };
+
+  useEffect(() => {
+    fetchTodos(pagination.page, 10, filters, sort);
+  }, [fetchTodos, pagination.page, filters, sort]);
+
   return {
     todos,
     loading,
@@ -117,7 +134,9 @@ const useTodos = () => {
     deleteTodo,
     getTodo,
     refreshTodos: fetchTodos,
-    changePage
+    changePage,
+    changeFilter,
+    changeSort
   };
 };
 
