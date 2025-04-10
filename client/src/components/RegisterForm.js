@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
@@ -17,15 +18,17 @@ const RegisterForm = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const { login } = useAuth();
+
   const onSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/register', {
+      const res = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/auth/register`, {
         username,
         email,
         password
       });
-      localStorage.setItem('token', res.data.token);
+      login(res.data.token, res.data.user);
       navigate('/');
     } catch (err) {
       setError(err.response?.data?.error || 'Registration failed');

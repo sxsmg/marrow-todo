@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { TodoProvider } from './context/TodoContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import TodoList from './components/TodoList';
 import TodoDetail from './components/TodoDetail';
 import TodoForm from './components/TodoForm';
@@ -10,50 +11,36 @@ import Navbar from './components/Navbar';
 import './App.css';
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      setIsAuthenticated(true);
-    }
-  }, []);
-
   return (
     <Router>
-      <TodoProvider>
-        <div className="app-container">
-          <Navbar isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} />
-          <Routes>
-          <Route
-            path="/"
-            element={isAuthenticated ? <TodoList /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/todos/new"
-            element={isAuthenticated ? <TodoForm /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/todos/:id/edit"
-            element={isAuthenticated ? <TodoForm /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/todos/:id"
-            element={isAuthenticated ? <TodoDetail /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/login"
-            element={!isAuthenticated ? <LoginForm setIsAuthenticated={setIsAuthenticated} /> : <Navigate to="/" />}
-          />
-          <Route
-            path="/register"
-            element={!isAuthenticated ? <RegisterForm setIsAuthenticated={setIsAuthenticated} /> : <Navigate to="/" />}
-          />
-          </Routes>
-        </div>
-      </TodoProvider>
+      <AuthProvider>
+        <TodoProvider>
+          <div className="app-container">
+            <Navbar />
+            <Routes>
+              <Route path="/" element={<ProtectedRoute><TodoList /></ProtectedRoute>} />
+              <Route path="/todos/new" element={<ProtectedRoute><TodoForm /></ProtectedRoute>} />
+              <Route path="/todos/:id/edit" element={<ProtectedRoute><TodoForm /></ProtectedRoute>} />
+              <Route path="/todos/:id" element={<ProtectedRoute><TodoDetail /></ProtectedRoute>} />
+              <Route path="/login" element={<LoginForm />} />
+              <Route path="/register" element={<RegisterForm />} />
+            </Routes>
+          </div>
+        </TodoProvider>
+      </AuthProvider>
     </Router>
   );
 }
+
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, user } = useAuth();
+  
+  // Wait for authentication check to complete
+  if (user === null && localStorage.getItem('token')) {
+    return <div>Loading...</div>;
+  }
+
+  return isAuthenticated ? children : <Navigate to="/login" />;
+};
 
 export default App;

@@ -1,8 +1,6 @@
 import axios from 'axios';
 
-const API_URL = process.env.NODE_ENV === 'development' 
-  ? 'http://localhost:5000/api/todos' 
-  : '/api/todos';
+const API_URL = `${process.env.REACT_APP_API_BASE_URL}/todos`;
 
 const getTodos = async () => {
   const token = localStorage.getItem('token');
@@ -53,10 +51,12 @@ const deleteTodo = async (id) => {
   });
 };
 
-export default {
+const todoService = {
   getTodos,
   getTodo,
   createTodo,
   updateTodo,
   deleteTodo
 };
+
+export default todoService;
