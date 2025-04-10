@@ -12,6 +12,7 @@ const TodoSchema = new mongoose.Schema({
     type: String,
     enum: ['High', 'Medium', 'Low'],
     default: 'Medium',
+    index: true
   },
   tags: {
     type: [String],

@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const API_URL = `${process.env.REACT_APP_API_BASE_URL}/todos`;
 
-const getTodos = async (page = 1, limit = 10, filters = {}, sort = 'createdAt:desc') => {
+const getTodos = async ({ page = 1, limit = 10, filters = {}, sort = 'createdAt:desc' }) => {
   const token = localStorage.getItem('token');
   const response = await axios.get(API_URL, {
     params: {

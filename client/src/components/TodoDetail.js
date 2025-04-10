@@ -13,7 +13,6 @@ const TodoDetail = ({ onUpdate }) => {
   const { getTodo } = useTodoContext();
 
   useEffect(() => {
-    console.log('Todo ID:', id); // Log the ID
     if (!id) {
       setError('Todo ID is required');
       setLoading(false);

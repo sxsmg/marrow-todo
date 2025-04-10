@@ -1,10 +1,25 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTodoContext } from '../context/TodoContext';
 import TodoItem from './TodoItem';
 
 const TodoList = () => {
-  const { todos, loading, error, pagination, changePage, changeFilter, changeSort } = useTodoContext();
+  const timeoutRef = useRef(null);
+  const context = useTodoContext();
+
+  const {
+    todos,
+    loading,
+    error,
+    pagination,
+    changePage,
+    changeFilter,
+    changeSort,
+    resetFilters,
+    filters,
+    sort,
+    refreshTodos
+  } = context;
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -20,27 +35,50 @@ const TodoList = () => {
         <div className="controls">
           <div className="filters">
             <select
-              onChange={(e) => changeFilter('priority', e.target.value)}
+              onChange={(e) => changeFilter('priority', e.target.value || undefined)}
+              value={filters.priority || ''}
             >
               <option value="">All Priorities</option>
-              <option value="High">High</option>
+              <option value="High">High (Highest)</option>
               <option value="Medium">Medium</option>
-              <option value="Low">Low</option>
+              <option value="Low">Low (Lowest)</option>
             </select>
+            <button
+              className="btn-reset"
+              onClick={() => {
+                resetFilters();
+                refreshTodos(1, 10, {}, sort);
+              }}
+              disabled={Object.keys(filters).length === 0}
+            >
+              Reset Filters
+            </button>
             <input
               type="text"
               placeholder="Filter by tags (comma separated)"
-              onChange={(e) => changeFilter('tags', e.target.value)}
+              onChange={(e) => {
+                clearTimeout(timeoutRef.current);
+                timeoutRef.current = setTimeout(() => {
+                  changeFilter('tags', e.target.value.trim().toLowerCase());
+                }, 300);
+              }}
             />
           </div>
           <div className="sorting">
             <select
-              onChange={(e) => changeSort(e.target.value)}
+              value={sort}
+              onChange={(e) => {
+                const newSort = e.target.value;
+                if (sort !== newSort) {
+                  changeSort(newSort);
+                }
+              }}
+              key={sort} // Force re-render when sort changes
             >
               <option value="createdAt:desc">Newest First</option>
               <option value="createdAt:asc">Oldest First</option>
-              <option value="priority:desc">High Priority First</option>
-              <option value="priority:asc">Low Priority First</option>
+              {/* <option value="priority:desc">High Priority First</option>
+              <option value="priority:asc">Low Priority First</option> */}
             </select>
           </div>
           <Link to="/todos/new" className="btn-new-todo">

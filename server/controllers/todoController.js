@@ -50,13 +50,24 @@ exports.getAllTodos = async (req, res) => {
     }
 
     if (tags) {
-      query.tags = { $in: tags.split(',') };
+      const tagArray = tags.split(',').map(tag => tag.trim().toLowerCase());
+      query.tags = { $all: tagArray.map(tag => new RegExp(tag, 'i')) };
     }
 
     const sortOptions = {};
     if (sort) {
       const [field, order] = sort.split(':');
-      sortOptions[field] = order === 'desc' ? -1 : 1;
+      if (field === 'priority') {
+        // Custom sort order for priority: High > Medium > Low
+        const priorityOrder = { High: 1, Medium: 2, Low: 3 };
+        if (order === 'desc') {
+          sortOptions[field] = { $sort: { $subtract: [0, { $arrayElemAt: [Object.values(priorityOrder), { $indexOfArray: [Object.keys(priorityOrder), `$${field}`] }] }] } };
+        } else {
+          sortOptions[field] = { $sort: { $arrayElemAt: [Object.values(priorityOrder), { $indexOfArray: [Object.keys(priorityOrder), `$${field}`] }] } };
+        }
+      } else {
+        sortOptions[field] = order === 'desc' ? -1 : 1;
+      }
     } else {
       sortOptions.createdAt = -1;
     }
