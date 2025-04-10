@@ -1,0 +1,28 @@
+# Dependencies
+/node_modules
+
+# Environment Variables
+.env
+
+# Logs
+logs
+*.log
+
+# Database files
+*.db
+*.sqlite
+
+# Debug
+npm-debug.log*
+
+# Coverage
+/coverage
+
+# IDE specific files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
