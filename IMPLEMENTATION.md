@@ -34,7 +34,7 @@
 
 ### Installation
 1. Clone the repository
-2. Navigate to project directory `/home/cypix-pc/marrow_todo`
+2. Navigate to project directory 
 3. Install dependencies for both client and server:
    ```bash
    cd client && npm install
@@ -80,8 +80,5 @@ To populate the database with sample data:
 - Error handling covers common scenarios like network errors and invalid data
 
 ## Improvements
-- Add user authentication system
 - Implement proper validation for user input
 - Add testing for both frontend and backend
-- Implement CSV/JSON export functionality
-- Add proper documentation for API endpoints
