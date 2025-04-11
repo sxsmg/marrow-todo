@@ -55,6 +55,17 @@
    cd ../client && npm start
    ```
 
+### Database Seeding
+To populate the database with sample data:
+
+1. Ensure the server is not running
+2. Run the seed script:
+   ```bash
+   cd server
+   npm run seed
+   ```
+   This will create 5 users with 5 todos each
+
 ## Implementation Details
 - **Todo Management**: Users can create, read, update and delete todos
 - **Pagination**: Todos are loaded with infinite scroll
