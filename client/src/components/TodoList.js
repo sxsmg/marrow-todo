@@ -82,6 +82,7 @@ const TodoList = () => {
             </select>
           </div>
           <div className="export-container">
+            <div>
             <button 
               className="btn-export"
               onClick={async () => {
@@ -108,8 +109,9 @@ const TodoList = () => {
                 }
               }}
             >
-              Export to Excel
+              + Export to Excel
             </button>
+            </div>
             <Link to="/todos/new" className="btn-new-todo">
               + New Todo
             </Link>
