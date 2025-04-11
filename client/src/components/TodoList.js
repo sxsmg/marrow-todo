@@ -81,9 +81,39 @@ const TodoList = () => {
               <option value="priority:asc">Low Priority First</option> */}
             </select>
           </div>
-          <Link to="/todos/new" className="btn-new-todo">
-            + New Todo
-          </Link>
+          <div className="export-container">
+            <button 
+              className="btn-export"
+              onClick={async () => {
+                try {
+                  const token = localStorage.getItem('token');
+                  const response = await fetch('http://localhost:5000/api/todos/export', {
+                    headers: {
+                      Authorization: `Bearer ${token}`
+                    }
+                  });
+                  
+                  if (!response.ok) throw new Error('Export failed');
+                  
+                  const blob = await response.blob();
+                  const url = window.URL.createObjectURL(blob);
+                  const link = document.createElement('a');
+                  link.href = url;
+                  link.setAttribute('download', 'todos.xlsx');
+                  document.body.appendChild(link);
+                  link.click();
+                  link.remove();
+                } catch (error) {
+                  console.error('Export error:', error);
+                }
+              }}
+            >
+              Export to Excel
+            </button>
+            <Link to="/todos/new" className="btn-new-todo">
+              + New Todo
+            </Link>
+          </div>
         </div>
       </div>
       {todos.length > 0 ? (

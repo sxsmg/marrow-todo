@@ -126,6 +126,24 @@ exports.updateTodo = async (req, res) => {
   }
 };
 
+const { exportUserTodos } = require('../services/exportService');
+
+// Export todos to Excel
+exports.exportTodos = async (req, res) => {
+  try {
+    console.log('Starting export process for user:', req.user._id);
+    const buffer = await exportUserTodos(req.user._id);
+    console.log('Excel file generated successfully');
+    
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=todos.xlsx');
+    res.send(buffer);
+  } catch (error) {
+    console.error('Export failed:', error);
+    res.status(500).json({ error: error.message || 'Failed to export todos' });
+  }
+};
+
 // Delete a todo
 exports.deleteTodo = async (req, res) => {
   try {
