@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useContext, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useTodoContext } from '../context/TodoContext';
 import EditTodoModal from './EditTodoModal';
 
@@ -10,7 +10,8 @@ const TodoDetail = ({ onUpdate }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const { getTodo } = useTodoContext();
+  const { todos, getTodo } = useTodoContext();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!id) {
@@ -30,14 +31,32 @@ const TodoDetail = ({ onUpdate }) => {
       }
     };
 
-    fetchTodo();
-  }, [id, getTodo]);
+    // Check if todo exists in the current context
+    const existingTodo = todos.find(t => t._id === id);
+    
+    // If todo doesn't exist in context, fetch from server
+    if (!existingTodo) {
+      fetchTodo();
+    } else {
+      setTodo(existingTodo);
+      setLoading(false);
+    }
+  }, [id, getTodo, todos]);
+
+  useEffect(() => {
+    // If todo is deleted and no longer exists in context
+    if (!loading && todos && !todos.find(t => t._id === id)) {
+      setTimeout(() => {
+        navigate('/', { state: { message: 'Todo was deleted' } });
+      }, 20);
+    }
+  }, [todos, id, loading, navigate]);
 
   // const navigate = useNavigate(); // Reserved for future navigation needs
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.includes('required') ? 'Invalid todo ID' : error}</div>;
-  if (!todo) return <div>Todo not found</div>;
+  if (!todo) return <div>Todo not found, redirecting...</div>;
 
   const handleEdit = () => {
     setShowEditModal(true);
